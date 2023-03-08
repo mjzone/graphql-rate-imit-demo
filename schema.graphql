@@ -1,0 +1,53 @@
+directive @rateLimit(
+  max: Int
+  window: String
+  message: String
+  identityArgs: [String]
+  arrayLengthField: String
+) on FIELD_DEFINITION
+
+type Query {
+  search(text: String!): [Product]! @rateLimit(window: "1s", max: 2)
+  cart(id: ID!): Cart! @rateLimit(window: "1s", max: 2)
+}
+
+type Product {
+  id: ID!
+  name: String!
+  description: String
+  quantity: Int!
+  price: Int!
+  image: String
+}
+
+type Mutation {
+  addToCart(input: AddToCartInput!): Cart!  @rateLimit(window: "1s", max: 2)
+}
+
+input AddToCartInput {
+  id: ID!
+  cartId: ID!
+  name: String!
+  description: String
+  image: String
+  price: Int!
+  quantity: Int = 1
+}
+
+type Cart {
+  id: ID!
+  totalItems: Int!
+  items: [CartItem!]!
+  subTotal: Int!
+}
+
+type CartItem {
+  id: ID!
+  name: String!
+  description: String
+  quantity: Int!
+  unitPrice: Int!
+  total: Int!
+  image: String
+}
+
